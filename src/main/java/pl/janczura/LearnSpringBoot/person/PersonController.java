@@ -1,9 +1,11 @@
 package pl.janczura.LearnSpringBoot.person;
 
+import jakarta.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -27,7 +29,7 @@ public class PersonController {
     private PersonService personService;
 
     @PostMapping
-    public ResponseEntity<Person> createPerson(@RequestBody Person person) {
+    public ResponseEntity<Person> createPerson(@Valid @RequestBody Person person) {
         Person createdPerson = personService.save(person);
         log.info("createPerson: {}", createdPerson);
         return ResponseEntity.ok(createdPerson);
@@ -39,7 +41,7 @@ public class PersonController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Person> updatePerson(@PathVariable("id") Long id,  @RequestBody Person person) {
+    public ResponseEntity<Person> updatePerson(@PathVariable("id") Long id,  @Valid @RequestBody Person person) {
         Person updatedPerson = personService.update(id, person);
         log.info("updatePerson: {}", updatedPerson);
         return ResponseEntity.ok(updatedPerson);

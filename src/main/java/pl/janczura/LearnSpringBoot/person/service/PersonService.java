@@ -9,13 +9,21 @@ import org.springframework.stereotype.Service;
 import pl.janczura.LearnSpringBoot.person.model.Person;
 import pl.janczura.LearnSpringBoot.person.model.PersonRepository;
 
+import jakarta.validation.ConstraintViolation;
+import jakarta.validation.Validation;
+import jakarta.validation.Validator;
+import jakarta.validation.ValidatorFactory;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 @Service
 public class PersonService {
 
     private static final Logger log = LoggerFactory.getLogger(PersonService.class);
+
+//    @Autowired
+    private Validator validator;
 
     @Autowired
     private PersonRepository personRepository;
@@ -24,6 +32,21 @@ public class PersonService {
     private ObjectMapper objectMapper;
 
     public PersonService() {
+        // TODO Czemu nie działa @Autovired
+        ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
+        this.validator = factory.getValidator();
+
+    }
+
+    public void validatePerson(Person person) {
+        Set<ConstraintViolation<Person>> violations = validator.validate(person);
+
+        if (!violations.isEmpty()) {
+            for (ConstraintViolation<Person> violation : violations) {
+                System.out.println(violation.getMessage());
+            }
+            throw new IllegalArgumentException("Validation failed for Person object");
+        }
     }
 
     public List<Person> getAll() {
