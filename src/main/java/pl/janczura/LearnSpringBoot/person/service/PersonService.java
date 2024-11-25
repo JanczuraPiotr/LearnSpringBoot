@@ -39,6 +39,7 @@ public class PersonService {
     }
 
     public void validatePerson(Person person) {
+        // Validator klasy Person napisany w celach poznawczych.
         Set<ConstraintViolation<Person>> violations = validator.validate(person);
 
         if (!violations.isEmpty()) {
