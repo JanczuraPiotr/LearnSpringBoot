@@ -20,4 +20,5 @@ public class PersonRepositoryTest {
         Person personSaved = personRepository.save(person);
         assertNotNull(personSaved.getId());
     }
+
 }

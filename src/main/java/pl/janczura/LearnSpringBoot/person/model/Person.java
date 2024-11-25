@@ -4,6 +4,8 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.Size;
 
 @Entity
 public class Person {
@@ -12,10 +14,15 @@ public class Person {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @NotEmpty
+    @Size(min = 3, max = 5)
     private String name;
 
+    @NotEmpty
+    @Size(min = 3, max = 5)
     private String surname;
 
+    public Person() {}
 
     public Person(String name, String surname) {
         this.id = null;
