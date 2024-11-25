@@ -41,7 +41,7 @@ public class PersonServiceTest {
     private static String SurnameToLong;
 
     @Test
-    public void shouldThrowExceptionWhenPersonIsOk() {
+    public void personIsOk() {
         {
             Person person = new Person(NameCorrectLongMinLim, SurnameCorrectLongMaxLim);
 
@@ -61,7 +61,7 @@ public class PersonServiceTest {
     }
 
     @Test
-    public void shouldThrowExceptionWhenPersonNameIsNull() {
+    public void personNameIsNull() {
         Person person = new Person(null, SurnameCorrectLongMinLim);
 
         assertThrows(IllegalArgumentException.class, () -> {
@@ -70,7 +70,7 @@ public class PersonServiceTest {
     }
 
     @Test
-    public void shouldThrowExceptionWhenPersonSurnameIsNull() {
+    public void personSurnameIsNull() {
         Person person = new Person(NameCorrectLongMinLim, null);
 
         assertThrows(IllegalArgumentException.class, () -> {
@@ -79,7 +79,7 @@ public class PersonServiceTest {
     }
 
     @Test
-    public void shouldThrowExceptionWhenPersonNameIsToShort() {
+    public void personNameIsToShort() {
         Person person = new Person(NameToShort, SurnameCorrectLongMaxLim);
         assertThrows(IllegalArgumentException.class, () -> {
             personService.validatePerson(person);
@@ -87,7 +87,7 @@ public class PersonServiceTest {
     }
 
     @Test
-    public void shouldThrowExceptionWhenPersonSurnameIsToShort() {
+    public void personSurnameIsToShort() {
         Person person = new Person(NameCorrectLongMaxLim, SurnameToShort);
 
         assertThrows(IllegalArgumentException.class, () -> {
@@ -96,7 +96,7 @@ public class PersonServiceTest {
     }
 
     @Test
-    public void shouldThrowExceptionWhenPersonNameIsToLong() {
+    public void personNameIsToLong() {
         Person person = new Person(NameToLong, SurnameCorrectLongMaxLim);
 
         assertThrows(IllegalArgumentException.class, () -> {
@@ -105,7 +105,7 @@ public class PersonServiceTest {
     }
 
     @Test
-    public void shouldThrowExceptionWhenPersonSurnameIsToLong() {
+    public void personSurnameIsToLong() {
         Person person = new Person(NameCorrectLongMaxLim, SurnameToLong);
 
         assertThrows(IllegalArgumentException.class, () -> {
