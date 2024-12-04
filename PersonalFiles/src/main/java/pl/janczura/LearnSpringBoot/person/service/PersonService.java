@@ -22,7 +22,6 @@ public class PersonService {
 
     private static final Logger log = LoggerFactory.getLogger(PersonService.class);
 
-//    @Autowired
     private Validator validator;
 
     @Autowired
@@ -36,18 +35,6 @@ public class PersonService {
         ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
         this.validator = factory.getValidator();
 
-    }
-
-    public void validatePerson(Person person) {
-        // Validator klasy Person napisany w celach poznawczych.
-        Set<ConstraintViolation<Person>> violations = validator.validate(person);
-
-        if (!violations.isEmpty()) {
-            for (ConstraintViolation<Person> violation : violations) {
-                System.out.println(violation.getMessage());
-            }
-            throw new IllegalArgumentException("Validation failed for Person object");
-        }
     }
 
     public List<Person> getAll() {

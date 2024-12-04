@@ -14,7 +14,7 @@ public class PersonRepositoryTest {
 
     @Test
     public void testIdIsSetAfterSave() {
-        Person person = new Person("John", "Doe");
+        Person person = new Person("Abc", "Def", "12345");
         assertNull(person.getId());
 
         Person personSaved = personRepository.save(person);
