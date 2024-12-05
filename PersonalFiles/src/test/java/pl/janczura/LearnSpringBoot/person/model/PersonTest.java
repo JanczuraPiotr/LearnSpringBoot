@@ -27,17 +27,17 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class PersonTest {
 
-    private static String NameToShort;
-    private static String NameCorrectLongMinLim;
-    private static String NameCorrectLongMaxLim;
-    private static String NameToLong;
-    private static String PersonalId = "1234567890";
-    private static String SurnameToShort;
-    private static String SurnameCorrectLongMinLim;
-    private static String SurnameCorrectLongMaxLim;
-    private static String SurnameToLong;
-    private static String MessageAboutExpectedName;
-    private static String MessageAboutExpectedSurname;
+    public static String NameToShort;
+    public static String NameCorrectLongMinLim;
+    public static String NameCorrectLongMaxLim;
+    public static String NameToLong;
+    public static String PersonalId = "1234567890";
+    public static String SurnameToShort;
+    public static String SurnameCorrectLongMinLim;
+    public static String SurnameCorrectLongMaxLim;
+    public static String SurnameToLong;
+    public static String MessageAboutExpectedName;
+    public static String MessageAboutExpectedSurname;
 
     @Autowired
     private Validator validator;
