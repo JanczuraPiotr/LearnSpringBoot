@@ -3,16 +3,15 @@ package pl.janczura.LearnSpringBoot.person.model;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.Validation;
 import jakarta.validation.Validator;
-import jakarta.validation.constraints.Size;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import java.lang.annotation.Annotation;
-import java.lang.reflect.Field;
 import java.util.Optional;
 import java.util.Set;
 
@@ -24,57 +23,89 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 // Test written for educational purposes.
 // 1. Is it possible to test compliance with constraints set for an entity somewhere other than in the controller?.
 // 2. How to read and use restrictions set by annotations.
+// I deliberately omit the tests for surname and personal_id, they will look the same.
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class PersonTest {
 
-    public static String NameToShort;
-    public static String NameCorrectLongMinLim;
-    public static String NameCorrectLongMaxLim;
-    public static String NameToLong;
-    public static String PersonalId = "1234567890";
-    public static String SurnameToShort;
-    public static String SurnameCorrectLongMinLim;
-    public static String SurnameCorrectLongMaxLim;
-    public static String SurnameToLong;
-    public static String MessageAboutExpectedName;
-    public static String MessageAboutExpectedSurname;
+    private static final Logger log = LoggerFactory.getLogger(PersonTest.class);
+    public static final String Name_ToShort               = "Ab";
+    public static final String Name_Correct_LongMin       = "Abc";
+    public static final String Name_Correct_LongMax       = "Abcdefghij";
+    public static final String Name_ToLong                = "Abcdefghijk";
+
+    public static final String Surname_ToShort            = "Lm";
+    public static final String Surname_Correct_LongMin    = "Lmn";
+    public static final String Surname_Correct_LongMax    = "Lmnoprstqu";
+    public static final String Surname_ToLong             = "Lmnoprstquw";
+
+    public static final String PersonalId_ToShort         = "1234";
+    public static final String PersonalId_Correct_LongMin = "12345";
+    public static final String PersonalId_Correct_LongMax = "1234567890";
+    public static final String PersonalId_ToLong          = "12345678901";
+
+    public static final Person Person1       = new Person(Name_Correct_LongMin,
+                                                          Surname_Correct_LongMin,
+                                                          PersonalId_Correct_LongMin);
+    public static final Person Person2       = new Person(Name_Correct_LongMin + "x",
+                                                          Surname_Correct_LongMin + "y",
+                                                          PersonalId_Correct_LongMin + "z");
+    public static final Person Person3       = new Person(Name_Correct_LongMax,
+                                                          Surname_Correct_LongMax,
+                                                          PersonalId_Correct_LongMax);
+    public static final Person Person1_saved = new Person(1L,
+                                                          Person1.getName(),
+                                                          Person1.getSurname(),
+                                                          Person1.getPersonalId());
+    public static final Person Person2_saved = new Person(2L,
+                                                          Person2.getName(),
+                                                          Person2.getSurname(),
+                                                          Person2.getPersonalId());
+    public static final Person Person3_saved = new Person(3L,
+                                                          Person3.getName(),
+                                                          Person3.getSurname(),
+                                                          Person3.getPersonalId());
+
+    public static String MessageAboutExpectedName    = "Length of `name` must be between 3 and 10 characters long.";
 
     @Autowired
     private Validator validator;
+
+    @BeforeAll
+    public static void setUp() {
+        log.info(Person1.toString());
+        log.info(Person2.toString());
+        log.info(Person3.toString());
+        log.info(Person1_saved.toString());
+        log.info(Person2_saved.toString());
+        log.info(Person3_saved.toString());
+    }
 
     public PersonTest() {
         this.validator = Validation.buildDefaultValidatorFactory().getValidator();
     }
 
-    @BeforeAll
-    public static void setUp() {
-        limitations();
-    }
-
     @Test
     @Order(1)
-    public void testGetSet() {
+    public void create() {
+        Person person = new Person(Name_Correct_LongMin, Surname_Correct_LongMin, PersonalId_Correct_LongMin);
+        assertEquals(Name_Correct_LongMin, person.getName());
+        assertEquals(Surname_Correct_LongMin, person.getSurname());
+        assertEquals(PersonalId_Correct_LongMin, person.getPersonalId());
 
-        Person person = new Person(NameCorrectLongMinLim, SurnameCorrectLongMinLim, PersonalId);
-        assertEquals(NameCorrectLongMinLim, person.getName());
-        assertEquals(SurnameCorrectLongMinLim, person.getSurname());
-        assertEquals(PersonalId, person.getPersonalId());
+        Person savedPerson = new Person(1L, Name_Correct_LongMin, Surname_Correct_LongMin, PersonalId_Correct_LongMin);
+        assertEquals(Name_Correct_LongMin, savedPerson.getName());
+        assertEquals(Surname_Correct_LongMin, savedPerson.getSurname());
+        assertEquals(PersonalId_Correct_LongMin, savedPerson.getPersonalId());
 
-        person.setName(NameCorrectLongMaxLim);
-        person.setSurname(SurnameCorrectLongMaxLim);
-        person.setPersonalId(PersonalId);
-
-        assertEquals(NameCorrectLongMaxLim, person.getName());
-        assertEquals(SurnameCorrectLongMaxLim, person.getSurname());
-        assertEquals(PersonalId, person.getPersonalId());
+        Person personCopy = new Person(person);
+        assertEquals(Name_Correct_LongMin, personCopy.getName());
+        assertEquals(Surname_Correct_LongMin, personCopy.getSurname());
+        assertEquals(PersonalId_Correct_LongMin, personCopy.getPersonalId());
     }
 
     @Test
     public void whenNameIsNull_thenValidationFails() {
-        Person person = new Person();
-        person.setName(null);
-        person.setSurname(SurnameCorrectLongMinLim);
-        person.setPersonalId(PersonalId);
+        Person person = new Person(null,Surname_Correct_LongMin,PersonalId_Correct_LongMin);
 
         Set<ConstraintViolation<Person>> violations = validator.validate(person);
         Optional<Failure> failure = validationConclusion("name", violations);
@@ -94,16 +125,13 @@ public class PersonTest {
 
     @Test
     public void whenNameIsToShort_thenValidationFails() {
-        Person person = new Person();
-        person.setName(NameToShort);
-        person.setSurname(null);
-        person.setPersonalId(null);
+        Person person = new Person(Name_ToShort,null,null);
 
         Set<ConstraintViolation<Person>> violations = validator.validate(person);
         Optional<Failure> failure = validationConclusion("name", violations);
 
         if (failure.isPresent()) {
-            assertTrue(failure.get().attribute().equals("name") && failure.get().actual().equals(NameToShort),
+            assertTrue(failure.get().attribute().equals("name") && failure.get().actual().equals(Name_ToShort),
                     "Expected: " + failure.get().expected() + ", Actual: " + failure.get().actual());
         } else {
             assertionFailure()
@@ -116,10 +144,7 @@ public class PersonTest {
 
     @Test
     public void whenNameIsCorrectMinLong_thenValidationCorrect() {
-        Person person = new Person();
-        person.setName(NameCorrectLongMinLim);
-        person.setSurname(null);
-        person.setPersonalId(null);
+        Person person = new Person(Name_Correct_LongMin,null,null);
 
         Set<ConstraintViolation<Person>> violations = validator.validate(person);
         Optional<Failure> failure = validationConclusion("name", violations);
@@ -137,10 +162,7 @@ public class PersonTest {
 
     @Test
     public void whenNameIsCorrectMaxLong_thenValidationCorrect() {
-        Person person = new Person();
-        person.setName(NameCorrectLongMaxLim);
-        person.setSurname(null);
-        person.setPersonalId(null);
+        Person person = new Person(Name_Correct_LongMax,null,null);
 
         Set<ConstraintViolation<Person>> violations = validator.validate(person);
         Optional<Failure> failure = validationConclusion("name", violations);
@@ -158,16 +180,13 @@ public class PersonTest {
 
     @Test
     public void whenNameIsToLong_thenValidationFails() {
-        Person person = new Person();
-        person.setName(NameToLong);
-        person.setSurname(null);
-        person.setPersonalId(null);
+        Person person = new Person(Name_ToLong,null,null);
 
         Set<ConstraintViolation<Person>> violations = validator.validate(person);
         Optional<Failure> failure = validationConclusion("name", violations);
 
         if (failure.isPresent()) {
-            assertTrue(failure.get().attribute().equals("name") && failure.get().actual().equals(NameToLong),
+            assertTrue(failure.get().attribute().equals("name") && failure.get().actual().equals(Name_ToLong),
                     "Expected: " + failure.get().expected() + ", Actual: " + failure.get().actual());
         } else {
             assertionFailure()
@@ -178,118 +197,7 @@ public class PersonTest {
         }
     }
 
-    @Test
-    public void whenSurnameIsNull_thenValidationFails() {
-        Person person = new Person();
-        person.setName(NameCorrectLongMinLim);
-        person.setSurname(null);
-        person.setPersonalId(PersonalId);
-
-        Set<ConstraintViolation<Person>> violations = validator.validate(person);
-        Optional<Failure> failure = validationConclusion("surname", violations);
-
-        if (failure.isPresent()) {
-            assertTrue(failure.get().attribute().equals("surname") && failure.get().actual().equals("null"),
-                    "Expected: " + failure.get().expected() + ", Actual: " + failure.get().actual());
-        } else {
-            assertionFailure()
-                    .reason("surname")
-                    .expected(MessageAboutExpectedSurname)
-                    .actual(person.getSurname()+ (person.getSurname() != null ? " (length = " + person.getSurname().length() + ")" : ""))
-                    .buildAndThrow();
-        }
-    }
-
-    @Test
-    public void whenSurnameIsToShort_thenValidationFails() {
-        Person person = new Person();
-        person.setName(null);
-        person.setSurname(SurnameToShort);
-        person.setPersonalId(null);
-
-        Set<ConstraintViolation<Person>> violations = validator.validate(person);
-        Optional<Failure> failure = validationConclusion("surname", violations);
-
-        if (failure.isPresent()) {
-            assertTrue(failure.get().attribute().equals("surname") && failure.get().actual().equals(SurnameToShort),
-                    "Expected: " + failure.get().expected() + ", Actual: " + failure.get().actual());
-        } else {
-            assertionFailure()
-                    .reason("surname")
-                    .expected(MessageAboutExpectedSurname)
-                    .actual(person.getSurname() + (person.getSurname() != null ? " (length = " + person.getSurname().length() + ")" : ""))
-                    .buildAndThrow();
-        }
-    }
-
-    @Test
-    public void whenSurnameIsCorrectMinLong_thenValidationCorrect() {
-        Person person = new Person();
-        person.setName(NameCorrectLongMaxLim);
-        person.setSurname(SurnameCorrectLongMinLim);
-        person.setPersonalId(null);
-
-        Set<ConstraintViolation<Person>> violations = validator.validate(person);
-        Optional<Failure> failure = validationConclusion("surname", violations);
-
-        if (failure.isEmpty()) {
-            assertTrue(true);
-        } else {
-            assertionFailure()
-                    .reason("surname")
-                    .expected(failure.get().expected())
-                    .actual(person.getSurname() + (person.getSurname() != null ? " (length = " + person.getSurname().length() + ")" : ""))
-                    .buildAndThrow();
-        }
-    }
-
-    @Test
-    public void whenSurnameIsCorrectMaxLong_thenValidationCorrect() {
-        Person person = new Person();
-        person.setName(NameToShort);
-        person.setSurname(SurnameCorrectLongMaxLim);
-        person.setPersonalId(null);
-
-        Set<ConstraintViolation<Person>> violations = validator.validate(person);
-        Optional<Failure> failure = validationConclusion("surname", violations);
-
-        if (failure.isEmpty()) {
-            assertTrue(true);
-        } else {
-            assertionFailure()
-                    .reason("surname")
-                    .expected(failure.get().expected())
-                    .actual(person.getSurname() + (person.getSurname() != null ? " (length = " + person.getSurname().length() + ")" : ""))
-                    .buildAndThrow();
-        }
-    }
-
-    @Test
-    public void whenSurnameIsToLong_thenValidationFails() {
-        Person person = new Person();
-        person.setName(null);
-        person.setSurname(SurnameToLong);
-        person.setPersonalId(null);
-
-        Set<ConstraintViolation<Person>> violations = validator.validate(person);
-        Optional<Failure> failure = validationConclusion("surname", violations);
-
-        if (failure.isPresent()) {
-            assertTrue(failure.get().attribute().equals("surname") && failure.get().actual().equals(SurnameToLong),
-                    "Expected: " + failure.get().expected() + ", Actual: " + failure.get().actual());
-        } else {
-            assertionFailure()
-                    .reason("surname")
-                    .expected(MessageAboutExpectedName)
-                    .actual(person.getSurname() + (person.getSurname() != null ? " (length = " + person.getSurname().length() + ")" : ""))
-                    .buildAndThrow();
-        }
-    }
-
-    //
-    // Celowo pomijam testy dla innych atrybutów.
-    //
-
+    // I'm checking how to test a created object based on annotations in its class definition.
     private static class Failure {
         private String attribute;
         private String expected;
@@ -329,45 +237,4 @@ public class PersonTest {
         }
     }
 
-    private static void limitations() {
-        Class<Person> clazz = Person.class;
-        try {
-            Field fieldName = clazz.getDeclaredField("name");
-            Annotation annotation = fieldName.getAnnotation(Size.class);
-            Size size =(Size)annotation;
-
-            if(size.min() > 0) {
-                NameToShort = "n".repeat(size.min() - 1);
-                NameCorrectLongMinLim = "n".repeat(size.min());
-            }
-            if(size.max() > 0) {
-                NameCorrectLongMaxLim = "n".repeat(size.max());
-                NameToLong = "n".repeat(size.max() + 1);
-            }
-
-            MessageAboutExpectedName = "Length of `name` must be between " + size.min() + " and " + size.max() + " characters long.";
-
-        } catch (NoSuchFieldException e) {
-            // ...
-        }
-
-        try {
-            Field fieldSurname = clazz.getDeclaredField("surname");
-            Annotation annotation = fieldSurname.getAnnotation(Size.class);
-            Size size =(Size)annotation;
-
-            if(size.min() > 0) {
-                SurnameToShort = "s".repeat(size.min() - 1);
-                SurnameCorrectLongMinLim = "s".repeat(size.min());
-            }
-            if(size.max() > 0) {
-                SurnameCorrectLongMaxLim = "s".repeat(size.max());
-                SurnameToLong = "s".repeat(size.max() + 1);
-            }
-            MessageAboutExpectedSurname = "Length of `surname` must be between " + size.min() + " and " + size.max() + " characters long.";
-
-        } catch (NoSuchFieldException e) {
-            // ...
-        }
-    }
 }

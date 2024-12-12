@@ -9,20 +9,13 @@ import org.springframework.stereotype.Service;
 import pl.janczura.LearnSpringBoot.person.model.Person;
 import pl.janczura.LearnSpringBoot.person.model.PersonRepository;
 
-import jakarta.validation.ConstraintViolation;
-import jakarta.validation.Validation;
-import jakarta.validation.Validator;
-import jakarta.validation.ValidatorFactory;
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 
 @Service
 public class PersonService {
 
     private static final Logger log = LoggerFactory.getLogger(PersonService.class);
-
-    private Validator validator;
 
     @Autowired
     private PersonRepository personRepository;
@@ -30,11 +23,12 @@ public class PersonService {
     @Autowired
     private ObjectMapper objectMapper;
 
-    public PersonService() {
-        // TODO Czemu nie działa @Autovired
-        ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
-        this.validator = factory.getValidator();
-
+    public boolean deleteById(Long id) {
+        if( personRepository.existsById(id)) {
+            personRepository.deleteById(id);
+            return true;
+        }
+        return false;
     }
 
     public List<Person> getAll() {
@@ -58,9 +52,10 @@ public class PersonService {
     }
 
     public Person update(Long id, Person person) {
-        Person personToUpdate = personRepository.getOne(id);
-        personToUpdate.setName(person.getName());
-        personToUpdate.setSurname(person.getSurname());
+        // TODO Tu nie ma testu czy rekord do aktualizacji istnieje w bazie. Wyłapać ten problem testami.
+        Person personSaved = personRepository.findById(id).get();
+        Person personToUpdate = new Person(personSaved.getId(), person.getName(), person.getSurname(), person.getPersonalId());
+
         Person ret = personRepository.save(personToUpdate);
 
         try {
@@ -72,7 +67,4 @@ public class PersonService {
         return ret;
     }
 
-    public void delete(Long id) {
-        personRepository.deleteById(id);
-    }
 }

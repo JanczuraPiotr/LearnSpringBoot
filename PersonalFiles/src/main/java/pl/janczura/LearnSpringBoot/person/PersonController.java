@@ -36,7 +36,7 @@ public class PersonController {
 
     @DeleteMapping("/{id}")
     public void deletePerson(Long id) {
-        personService.delete(id);
+        personService.deleteById(id);
     }
 
     @PutMapping("/{id}")

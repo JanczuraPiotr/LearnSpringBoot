@@ -14,6 +14,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.web.servlet.MockMvc;
 import pl.janczura.LearnSpringBoot.person.model.Person;
+import pl.janczura.LearnSpringBoot.person.model.PersonTest;
 import pl.janczura.LearnSpringBoot.person.service.PersonService;
 
 import java.util.Optional;
@@ -30,12 +31,8 @@ public class PersonControllerTest {
 
     @Test
     public void testCreatePerson() throws Exception {
-        Long personId = 1L;
-        Person person = new Person("Jan", "Kowalski", "1234567890");
-        person.setId(personId);
 
-        given(personService.getById(personId)).willReturn(Optional.of(person));
-
+//        given(personService.getById(PersonTest.Person1_saved.getId())).willReturn(Optional.of(PersonTest.Person1_saved));
 //        mockMvc.perform(post("/person/{id}", personId))
 //                .andExpect(status().isOk())
 //                .andExpect(jsonPath("$.id", is(person.getId().intValue())))
@@ -45,12 +42,9 @@ public class PersonControllerTest {
 
     @Test
     public void testUpdatePerson() throws Exception {
-        Long personId = 1L;
-        Person person = new Person("Jan", "Kowalski", "1234567890");
-        person.setId(personId);
 
-        given(personService.getById(personId)).willReturn(Optional.of(person));
-
+//        given(personService.getById(PersonTest.Person1_saved.getId())).willReturn(Optional.of(PersonTest.Person1_saved));
+//
 //        mockMvc.perform(post("/person/{id}", personId))
 //                .andExpect(status().isOk())
 //                .andExpect(jsonPath("$.id", is(person.getId().intValue())))
@@ -66,9 +60,6 @@ public class PersonControllerTest {
 
     @Test
     public void testGetPersonById() throws Exception {
-//        Long personId = 1L;
-//        Person person = new Person("Jan", "Kowalski", "1234567890");
-//        person.setId(personId);
 //
 //        given(personService.getById(personId)).willReturn(Optional.of(person));
 //
@@ -82,9 +73,6 @@ public class PersonControllerTest {
 
     @Test
     public void testGetAllPerson() throws Exception {
-//        Long personId = 1L;
-//        Person person = new Person("Jan", "Kowalski", "1234567890");
-//        person.setId(personId);
 //
 //        given(personService.getById(personId)).willReturn(Optional.of(person));
 //
