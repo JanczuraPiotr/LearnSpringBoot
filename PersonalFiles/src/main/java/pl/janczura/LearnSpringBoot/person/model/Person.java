@@ -73,22 +73,6 @@ public class Person {
         return this.id;
     }
 
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public void setSurname(String surname) {
-        this.surname = surname;
-    }
-
-    public void setPersonalId(String idPersonal) {
-        this.personalId = idPersonal;
-    }
-
-//    public void setId(Long id) {
-//        this.id = id;
-//    }
-
     @Override
     public String toString() {
         return "Person{" +

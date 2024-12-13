@@ -14,6 +14,8 @@ import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.when;
 
 
 @DataJpaTest
@@ -120,6 +122,24 @@ public class PersonRepositoryTest {
 
         Exception exception = assertThrows(DataIntegrityViolationException.class, () -> personRepository.save(person2));
         assertTrue(exception.getMessage().contains("could not execute statement"));
+    }
+
+    @Test
+    public void update() {
+        // TODO przetestować pojawianie się właściwych logów
+        assertFalse(true, "Not implemented yet.");
+    }
+
+    @Test
+    public void update_DuplicatePersonalId() {
+        // TODO przetestować pojawianie się właściwych logów
+        assertFalse(true, "Not implemented yet.");
+    }
+
+    @Test
+    public void update_NonExistingPerson() {
+        // TODO przetestować pojawianie się właściwych logów
+        assertFalse(true, "Not implemented yet.");
     }
 
 

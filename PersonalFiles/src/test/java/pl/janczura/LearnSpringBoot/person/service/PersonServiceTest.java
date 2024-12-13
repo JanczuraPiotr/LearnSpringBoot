@@ -60,8 +60,10 @@ public class PersonServiceTest {
     @Test
     public void getById() {
 
-        when(personRepository.findById(PersonTest.Person1_saved.getId())).thenReturn(java.util.Optional.empty());
-        when(personRepository.findById(PersonTest.Person2_saved.getId())).thenReturn(java.util.Optional.of(PersonTest.Person2_saved));
+        when(personRepository.findById(PersonTest.Person1_saved.getId()))
+                             .thenReturn(java.util.Optional.empty());
+        when(personRepository.findById(PersonTest.Person2_saved.getId()))
+                             .thenReturn(java.util.Optional.of(PersonTest.Person2_saved));
 
         Optional<Person> personRead1 = personService.getById(PersonTest.Person1_saved.getId());
         assertFalse(personRead1.isPresent());
@@ -98,27 +100,40 @@ public class PersonServiceTest {
 
     @Test
     public void update() {
-        Person personToUpdate = new Person(PersonTest.Person2.getName(),
+        Person personToUpdate = new Person(PersonTest.Person1_saved.getId(),
+                                           PersonTest.Person2.getName(),
                                            PersonTest.Person2.getSurname(),
                                            PersonTest.Person2.getPersonalId());
-        Person personUpdated = new Person(PersonTest.Person1_saved.getId(),
-                                          PersonTest.Person2.getName(),
-                                          PersonTest.Person2.getSurname(),
-                                          PersonTest.Person2.getPersonalId());
 
         when(personRepository.findById(PersonTest.Person1_saved.getId())).thenReturn(Optional.of(PersonTest.Person1_saved));
-        when(personRepository.save(personToUpdate)).thenReturn(personUpdated);
+        when(personRepository.save(any(Person.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
-        Person personNew = personService.update(PersonTest.Person1_saved.getId(), personToUpdate);
+        Person updatedPerson = personService.update(PersonTest.Person1_saved.getId(), personToUpdate);
 
-        assertEquals(PersonTest.Person1_saved.getId(), personNew.getId());
-        assertEquals(PersonTest.Person2.getName(), personNew.getName());
-        assertEquals(PersonTest.Person2.getSurname(), personNew.getSurname());
-        assertEquals(PersonTest.Person2.getPersonalId(), personNew.getPersonalId());
+        assertNotNull(updatedPerson);
+        assertEquals(PersonTest.Person1_saved.getId(), updatedPerson.getId());
+        assertEquals(PersonTest.Person2.getName(), updatedPerson.getName());
+        assertEquals(PersonTest.Person2.getSurname(), updatedPerson.getSurname());
+        assertEquals(PersonTest.Person2.getPersonalId(), updatedPerson.getPersonalId());
+    }
 
-//        when(personRepository.save(person2)).thenThrow(new IllegalArgumentException("Duplicate personalId value"));
-//
-//        personService.save(person1);
-//        assertThrows(IllegalArgumentException.class, () -> personService.save(person2));
+    @Test
+    public void update_DuplicatePersonalId() {
+        Person person2 = new Person(PersonTest.Person2.getId(),
+                                    PersonTest.Person2.getName(),
+                                    PersonTest.Person2.getSurname(),
+                                    PersonTest.Person1.getPersonalId());
+
+        when(personRepository.findById(PersonTest.Person1_saved.getId()))
+                .thenReturn(Optional.of(PersonTest.Person1_saved));
+        when(personRepository.save(person2))
+                .thenThrow(new IllegalArgumentException("Duplicate personalId value"));
+
+        assertThrows(IllegalArgumentException.class, () -> personService.save(person2));
+    }
+
+    @Test
+    public void update_NonExistingPerson() {
+        assertFalse(true, "Not implemented yet.");
     }
 }

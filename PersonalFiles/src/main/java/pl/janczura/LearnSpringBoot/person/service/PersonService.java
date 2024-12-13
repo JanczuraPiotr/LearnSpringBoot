@@ -43,25 +43,34 @@ public class PersonService {
         Person ret = personRepository.save(person);
 
         try {
-            log.info("savePerson: {}",  objectMapper.writeValueAsString(ret));
+            log.info("Person saved: {}",  objectMapper.writeValueAsString(ret));
         } catch (JsonProcessingException e) {
-            log.info("savePerson: Unknown error while processing json");
+            if(null == ret) {
+                log.error("Person not saved: Unknown error while processing json.");
+            }
         }
 
         return ret;
     }
 
     public Person update(Long id, Person person) {
-        // TODO Tu nie ma testu czy rekord do aktualizacji istnieje w bazie. Wyłapać ten problem testami.
-        Person personSaved = personRepository.findById(id).get();
-        Person personToUpdate = new Person(personSaved.getId(), person.getName(), person.getSurname(), person.getPersonalId());
+        Optional<Person> personSaved = personRepository.findById(id);
+        if(!personSaved.isPresent()) {
+            log.warn("Attempt to update non existing person with id:", id);
+            return null;
+        }
+        Person personToUpdate = new Person(personSaved.get().getId(),
+                                           person.getName(),
+                                           person.getSurname(),
+                                           person.getPersonalId());
 
         Person ret = personRepository.save(personToUpdate);
-
         try {
-            log.info("updatePerson: {}",  objectMapper.writeValueAsString(ret));
+            log.info("Person updated: {}",  objectMapper.writeValueAsString(ret));
         } catch (JsonProcessingException e) {
-            log.info("updatePerson: Unknown error while processing json");
+            if(null == ret) {
+                log.error("Person not udated: Unknown error while processing json.");
+            }
         }
 
         return ret;
