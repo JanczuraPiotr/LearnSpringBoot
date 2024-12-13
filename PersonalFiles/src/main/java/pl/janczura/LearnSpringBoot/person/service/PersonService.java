@@ -9,21 +9,13 @@ import org.springframework.stereotype.Service;
 import pl.janczura.LearnSpringBoot.person.model.Person;
 import pl.janczura.LearnSpringBoot.person.model.PersonRepository;
 
-import jakarta.validation.ConstraintViolation;
-import jakarta.validation.Validation;
-import jakarta.validation.Validator;
-import jakarta.validation.ValidatorFactory;
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 
 @Service
 public class PersonService {
 
     private static final Logger log = LoggerFactory.getLogger(PersonService.class);
-
-//    @Autowired
-    private Validator validator;
 
     @Autowired
     private PersonRepository personRepository;
@@ -31,23 +23,12 @@ public class PersonService {
     @Autowired
     private ObjectMapper objectMapper;
 
-    public PersonService() {
-        // TODO Czemu nie działa @Autovired
-        ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
-        this.validator = factory.getValidator();
-
-    }
-
-    public void validatePerson(Person person) {
-        // Validator klasy Person napisany w celach poznawczych.
-        Set<ConstraintViolation<Person>> violations = validator.validate(person);
-
-        if (!violations.isEmpty()) {
-            for (ConstraintViolation<Person> violation : violations) {
-                System.out.println(violation.getMessage());
-            }
-            throw new IllegalArgumentException("Validation failed for Person object");
+    public boolean deleteById(Long id) {
+        if( personRepository.existsById(id)) {
+            personRepository.deleteById(id);
+            return true;
         }
+        return false;
     }
 
     public List<Person> getAll() {
@@ -62,30 +43,37 @@ public class PersonService {
         Person ret = personRepository.save(person);
 
         try {
-            log.info("savePerson: {}",  objectMapper.writeValueAsString(ret));
+            log.info("Person saved: {}",  objectMapper.writeValueAsString(ret));
         } catch (JsonProcessingException e) {
-            log.info("savePerson: Unknown error while processing json");
+            if(null == ret) {
+                log.error("Person not saved: Unknown error while processing json.");
+            }
         }
 
         return ret;
     }
 
     public Person update(Long id, Person person) {
-        Person personToUpdate = personRepository.getOne(id);
-        personToUpdate.setName(person.getName());
-        personToUpdate.setSurname(person.getSurname());
-        Person ret = personRepository.save(personToUpdate);
+        Optional<Person> personSaved = personRepository.findById(id);
+        if(!personSaved.isPresent()) {
+            log.warn("Attempt to update non existing person with id:", id);
+            return null;
+        }
+        Person personToUpdate = new Person(personSaved.get().getId(),
+                                           person.getName(),
+                                           person.getSurname(),
+                                           person.getPersonalId());
 
+        Person ret = personRepository.save(personToUpdate);
         try {
-            log.info("updatePerson: {}",  objectMapper.writeValueAsString(ret));
+            log.info("Person updated: {}",  objectMapper.writeValueAsString(ret));
         } catch (JsonProcessingException e) {
-            log.info("updatePerson: Unknown error while processing json");
+            if(null == ret) {
+                log.error("Person not udated: Unknown error while processing json.");
+            }
         }
 
         return ret;
     }
 
-    public void delete(Long id) {
-        personRepository.deleteById(id);
-    }
 }

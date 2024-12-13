@@ -5,7 +5,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -37,7 +36,7 @@ public class PersonController {
 
     @DeleteMapping("/{id}")
     public void deletePerson(Long id) {
-        personService.delete(id);
+        personService.deleteById(id);
     }
 
     @PutMapping("/{id}")
@@ -60,4 +59,7 @@ public class PersonController {
         log.info("getPersonById: {}", person);
         return person;
     }
+
+
+
 }
