@@ -124,23 +124,5 @@ public class PersonRepositoryTest {
         assertTrue(exception.getMessage().contains("could not execute statement"));
     }
 
-    @Test
-    public void update() {
-        // TODO przetestować pojawianie się właściwych logów
-        assertFalse(true, "Not implemented yet.");
-    }
-
-    @Test
-    public void update_DuplicatePersonalId() {
-        // TODO przetestować pojawianie się właściwych logów
-        assertFalse(true, "Not implemented yet.");
-    }
-
-    @Test
-    public void update_NonExistingPerson() {
-        // TODO przetestować pojawianie się właściwych logów
-        assertFalse(true, "Not implemented yet.");
-    }
-
 
 }

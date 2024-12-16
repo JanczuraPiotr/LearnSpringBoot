@@ -17,6 +17,7 @@ import pl.janczura.LearnSpringBoot.person.model.Person;
 import pl.janczura.LearnSpringBoot.person.service.PersonService;
 
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/person")
@@ -41,9 +42,12 @@ public class PersonController {
 
     @PutMapping("/{id}")
     public ResponseEntity<Person> updatePerson(@PathVariable("id") Long id,  @Valid @RequestBody Person person) {
-        Person updatedPerson = personService.update(id, person);
+        Optional<Person> updatedPerson = personService.update(id, person);
+        if(!updatedPerson.isPresent()) {
+            return ResponseEntity.notFound().build();
+        }
         log.info("updatePerson: {}", updatedPerson);
-        return ResponseEntity.ok(updatedPerson);
+        return ResponseEntity.ok(updatedPerson.get());
     }
 
     @GetMapping
