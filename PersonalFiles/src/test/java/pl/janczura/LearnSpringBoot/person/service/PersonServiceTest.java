@@ -69,7 +69,7 @@ public class PersonServiceTest {
         assertFalse(personRead1.isPresent());
 
         Optional<Person> personRead2 = personService.getById(PersonTest.Person2_saved.getId());
-        assertNotNull(personRead2);
+        assertTrue(personRead2.isPresent());
         assertEquals(PersonTest.Person2_saved.getPersonalId(), personRead2.get().getPersonalId());
     }
 
@@ -108,13 +108,14 @@ public class PersonServiceTest {
         when(personRepository.findById(PersonTest.Person1_saved.getId())).thenReturn(Optional.of(PersonTest.Person1_saved));
         when(personRepository.save(any(Person.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
-        Person updatedPerson = personService.update(PersonTest.Person1_saved.getId(), personToUpdate);
+        Optional<Person> personUpdatedOpt = personService.update(PersonTest.Person1_saved.getId(), personToUpdate);
 
-        assertNotNull(updatedPerson);
-        assertEquals(PersonTest.Person1_saved.getId(), updatedPerson.getId());
-        assertEquals(PersonTest.Person2.getName(), updatedPerson.getName());
-        assertEquals(PersonTest.Person2.getSurname(), updatedPerson.getSurname());
-        assertEquals(PersonTest.Person2.getPersonalId(), updatedPerson.getPersonalId());
+        assertTrue(personUpdatedOpt.isPresent());
+        Person personUpdated = personUpdatedOpt.get();
+        assertEquals(PersonTest.Person1_saved.getId(), personUpdated.getId());
+        assertEquals(PersonTest.Person2.getName(), personUpdated.getName());
+        assertEquals(PersonTest.Person2.getSurname(), personUpdated.getSurname());
+        assertEquals(PersonTest.Person2.getPersonalId(), personUpdated.getPersonalId());
     }
 
     @Test
@@ -134,6 +135,11 @@ public class PersonServiceTest {
 
     @Test
     public void update_NonExistingPerson() {
-        assertFalse(true, "Not implemented yet.");
+        when(personRepository.findById(any(Long.class))).thenReturn(Optional.empty());
+
+        Optional<Person> personUpdated = personService.update(999L, PersonTest.Person1);
+
+        assertFalse(personUpdated.isPresent(), "Person should not exist.");
     }
+
 }

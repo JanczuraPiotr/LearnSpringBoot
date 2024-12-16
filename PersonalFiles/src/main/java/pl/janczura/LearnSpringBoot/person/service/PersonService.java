@@ -45,35 +45,32 @@ public class PersonService {
         try {
             log.info("Person saved: {}",  objectMapper.writeValueAsString(ret));
         } catch (JsonProcessingException e) {
-            if(null == ret) {
-                log.error("Person not saved: Unknown error while processing json.");
-            }
+            log.error("Person not saved: Unknown error while processing json.");
         }
 
         return ret;
     }
 
-    public Person update(Long id, Person person) {
-        Optional<Person> personSaved = personRepository.findById(id);
-        if(!personSaved.isPresent()) {
+    public Optional<Person> update(Long id, Person person) {
+        Optional<Person> personToUpdate = personRepository.findById(id);
+
+        if(!personToUpdate.isPresent()) {
             log.warn("Attempt to update non existing person with id:", id);
-            return null;
+            return Optional.empty();
         }
-        Person personToUpdate = new Person(personSaved.get().getId(),
+        Person personNewValue = new Person(personToUpdate.get().getId(),
                                            person.getName(),
                                            person.getSurname(),
                                            person.getPersonalId());
 
-        Person ret = personRepository.save(personToUpdate);
+        Person personSaved = personRepository.save(personNewValue);
         try {
-            log.info("Person updated: {}",  objectMapper.writeValueAsString(ret));
+            log.info("Person updated: {}",  objectMapper.writeValueAsString(personSaved));
         } catch (JsonProcessingException e) {
-            if(null == ret) {
-                log.error("Person not udated: Unknown error while processing json.");
-            }
+            log.error("Person not udated: Unknown error while processing json.");
         }
 
-        return ret;
+        return Optional.of(personSaved);
     }
 
 }
