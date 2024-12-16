@@ -31,19 +31,35 @@ public class PersonController {
     @PostMapping
     public ResponseEntity<Person> createPerson(@Valid @RequestBody Person person) {
         Person createdPerson = personService.save(person);
-        log.info("createPerson: {}", createdPerson);
-        return ResponseEntity.ok(createdPerson);
+
+        if(createdPerson != null) {
+            log.info("createPerson: {}", createdPerson);
+            return ResponseEntity.ok().body(createdPerson);
+        } else {
+            log.info("Error while creating person : {}", person);
+            return ResponseEntity.internalServerError().body(person);
+        }
     }
 
     @DeleteMapping("/{id}")
-    public void deletePerson(Long id) {
-        personService.deleteById(id);
+    public ResponseEntity<Boolean> deletePerson(@PathVariable("id") Long id) {
+        boolean result = personService.deleteById(id);
+
+        if(result) {
+            log.info("deletePerson: {}", id);
+            return ResponseEntity.ok().build();
+        } else {
+            log.info("deletePerson: {} not found", id);
+            return ResponseEntity.internalServerError().build();
+        }
     }
 
     @PutMapping("/{id}")
     public ResponseEntity<Person> updatePerson(@PathVariable("id") Long id,  @Valid @RequestBody Person person) {
         Optional<Person> updatedPerson = personService.update(id, person);
+
         if(!updatedPerson.isPresent()) {
+            log.info("updatedPerson: {}", updatedPerson);
             return ResponseEntity.notFound().build();
         }
         log.info("updatePerson: {}", updatedPerson);

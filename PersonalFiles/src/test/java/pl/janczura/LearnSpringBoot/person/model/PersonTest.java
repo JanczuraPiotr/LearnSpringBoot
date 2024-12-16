@@ -3,7 +3,6 @@ package pl.janczura.LearnSpringBoot.person.model;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.Validation;
 import jakarta.validation.Validator;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
@@ -69,16 +68,6 @@ public class PersonTest {
 
     @Autowired
     private Validator validator;
-
-    @BeforeAll
-    public static void setUp() {
-        log.info(Person1.toString());
-        log.info(Person2.toString());
-        log.info(Person3.toString());
-        log.info(Person1_saved.toString());
-        log.info(Person2_saved.toString());
-        log.info(Person3_saved.toString());
-    }
 
     public PersonTest() {
         this.validator = Validation.buildDefaultValidatorFactory().getValidator();
