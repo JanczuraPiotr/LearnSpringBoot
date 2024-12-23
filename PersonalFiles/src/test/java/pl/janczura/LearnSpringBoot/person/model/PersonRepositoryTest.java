@@ -31,7 +31,9 @@ public class PersonRepositoryTest {
 
     @BeforeEach
     void clearDatabase() {
-        jdbcTemplate.execute("TRUNCATE TABLE person" );
+        jdbcTemplate.execute("DELETE FROM customer" );
+        jdbcTemplate.execute("DELETE FROM employee" );
+        jdbcTemplate.execute("DELETE FROM person" );
     }
 
     @Test
